@@ -200,7 +200,7 @@
         Softhouse(c)2025
     </div>
 
-    <div style="display: none;">
+    <div style="display: none;" th:if="${lancamentoParaEditar != null}">
         <th:block th:fragment="form-edicao">
             <div th:id="'lancamento-' + ${lancamentoParaEditar.id}" class="edit-form-row">
                 <div class="col-desc">
