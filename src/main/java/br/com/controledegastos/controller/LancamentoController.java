@@ -6,7 +6,13 @@ import br.com.controledegastos.repository.LancamentoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.DeleteMapping;
 
 import java.util.Comparator;
 import java.util.List;
@@ -25,13 +31,13 @@ public class LancamentoController {
     }
 
     @GetMapping("/")
-    public String index(Model model) {
+    public String index(Model model, @RequestHeader(value = "HX-Request", defaultValue = "false") boolean hxRequest) {
         carregarLancamentos(model);
         model.addAttribute("novoLancamento", new Lancamento());
         model.addAttribute("tipos", TipoLancamento.values());
         // Garante que o objeto exista para o parser do Thymeleaf na carga inicial da página.
         model.addAttribute("lancamentoParaEditar", new Lancamento());
-        return "index";
+        return hxRequest ? "index :: lista-lancamentos" : "index";
     }
 
     @PostMapping("/lancamentos")
