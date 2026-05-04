@@ -200,11 +200,10 @@
         Carlos Eduardo Paiva Santos (c) 2025
     </div>
 
-    <div style="display: none;" th:if="${lancamentoParaEditar != null}">
-        <th:block th:fragment="form-edicao">
-            <div th:id="'lancamento-' + ${lancamentoParaEditar.id}" class="edit-form-row">
-                <div class="col-desc">
-                    <input type="text" name="descricao" th:value="${lancamentoParaEditar.descricao}">
+    <th:block th:fragment="form-edicao">
+        <div th:if="${lancamentoParaEditar != null}" th:id="'lancamento-' + ${lancamentoParaEditar.id}" class="edit-form-row">
+            <div class="col-desc">
+                <input type="text" name="descricao" th:value="${lancamentoParaEditar.descricao}">
                 </div>
                 <div class="col-valor">
                     <input type="number" step="0.01" name="valor" th:value="${lancamentoParaEditar.valor}">
