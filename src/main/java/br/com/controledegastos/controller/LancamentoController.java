@@ -35,8 +35,6 @@ public class LancamentoController {
         carregarLancamentos(model);
         model.addAttribute("novoLancamento", new Lancamento());
         model.addAttribute("tipos", TipoLancamento.values());
-        // Garante que o objeto exista para o parser do Thymeleaf na carga inicial da página.
-        model.addAttribute("lancamentoParaEditar", new Lancamento());
         return hxRequest ? "index :: lista-lancamentos" : "index";
     }
 
@@ -62,6 +60,13 @@ public class LancamentoController {
             model.addAttribute("tipos", TipoLancamento.values());
             return "index :: form-edicao";
         }
+        return "index :: lista-lancamentos";
+    }
+
+    @GetMapping("/lancamentos/lista")
+    public String listaLancamentos(Model model) {
+        carregarLancamentos(model);
+        model.addAttribute("tipos", TipoLancamento.values());
         return "index :: lista-lancamentos";
     }
 

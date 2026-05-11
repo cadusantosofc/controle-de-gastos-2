@@ -201,7 +201,7 @@
     </div>
 
     <th:block th:fragment="form-edicao">
-        <div th:if="${lancamentoParaEditar != null}" th:id="'lancamento-' + ${lancamentoParaEditar.id}" class="edit-form-row">
+        <div th:if="${lancamentoParaEditar != null and lancamentoParaEditar.id != null}" th:id="'lancamento-' + ${lancamentoParaEditar.id}" class="edit-form-row">
             <div class="col-desc">
                 <input type="text" name="descricao" th:value="${lancamentoParaEditar.descricao}">
                 </div>
@@ -229,7 +229,7 @@
                             Salvar
                         </button>
                         <button class="action-btn cancel-btn"
-                                th:hx-get="@{/}"
+                                th:hx-get="@{/lancamentos/lista}"
                                 hx-target="#lista-lancamentos"
                                 hx-swap="innerHTML">
                             Cancelar
