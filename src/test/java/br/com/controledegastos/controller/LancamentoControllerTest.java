@@ -45,14 +45,13 @@ class LancamentoControllerTest {
         lancamento.setDescricao("Teste");
         when(lancamentoRepository.findAll()).thenReturn(List.of(lancamento));
 
-        String viewName = controller.index(model);
+        String viewName = controller.index(model, false);
 
         assertEquals("index", viewName);
         verify(lancamentoRepository).findAll();
         verify(model).addAttribute(eq("lancamentos"), lancamentoListCaptor.capture());
         verify(model).addAttribute(eq("novoLancamento"), any(Lancamento.class));
         verify(model).addAttribute(eq("tipos"), eq(TipoLancamento.values()));
-        verify(model).addAttribute(eq("lancamentoParaEditar"), any(Lancamento.class));
         assertEquals(1, lancamentoListCaptor.getValue().size());
     }
 
