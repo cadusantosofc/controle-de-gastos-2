@@ -70,6 +70,17 @@ h1 {
     background-color: var(--bg-color);
     color: var(--text-color);
     min-width: 0;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.form-row input:focus,
+.form-row select:focus,
+.edit-form-row input:focus,
+.edit-form-row select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(0, 82, 204, 0.12);
 }
 
 .input-desc {
@@ -157,6 +168,12 @@ button {
     color: var(--green-color);
 }
 
+.saldo-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
 .saldo-card {
     background-color: var(--card-bg-color);
     border: 1px solid var(--border-color);
@@ -164,7 +181,24 @@ button {
     padding: 16px;
     margin-bottom: 18px;
     box-shadow: var(--shadow);
+    text-align: center;
 }
+
+.saldo-card h3 {
+    margin: 0;
+    font-size: 14px;
+    text-transform: uppercase;
+    color: var(--subtext-color);
+}
+
+.saldo-card p {
+    margin: 8px 0 0;
+    font-size: 2rem;
+    font-weight: 700;
+}
+
+.saldo-card.positivo p { color: var(--green-color); }
+.saldo-card.negativo p { color: var(--red-color); }
 
 .saldo-title {
     font-size: 0.9rem;

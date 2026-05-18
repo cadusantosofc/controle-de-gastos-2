@@ -32,7 +32,6 @@ public class LancamentoController {
     @Autowired
     private LancamentoRepository lancamentoRepository;
 
-    // Método auxiliar para carregar dados e calcular o saldo
     private void carregarDados(Model model, int page) {
         Pageable pageable = PageRequest.of(page, 5, Sort.by("data").descending());
         Page<Lancamento> lancamentosPage = lancamentoRepository.findAll(pageable);
@@ -49,41 +48,51 @@ public class LancamentoController {
     }
 
     @GetMapping("/")
-    public String index(Model model,
-            @RequestParam(value = "page", defaultValue = "0") int page,
-            @RequestHeader(value = "HX-Request", defaultValue = "false") boolean hxRequest) {
+    public String index(@RequestParam(defaultValue = "0") int page,
+                        @RequestHeader(value = "HX-Request", required = false) boolean isHtmx,
+                        Model model) {
         carregarDados(model, page);
         model.addAttribute("novoLancamento", new Lancamento());
         model.addAttribute("tipos", TipoLancamento.values());
-        return hxRequest ? "index :: lista-lancamentos" : "index";
+        model.addAttribute("lancamentoParaEditar", new Lancamento());
+
+        if (isHtmx) {
+            return "index :: lista-lancamentos";
+        }
+        return "index";
     }
 
-    public String index(Model model, boolean hxRequest) {
-        return index(model, 0, hxRequest);
+    public String index(Model model, boolean isHtmx) {
+        return index(0, isHtmx, model);
     }
 
     @PostMapping("/lancamentos")
     public String addLancamento(@Valid @ModelAttribute("novoLancamento") Lancamento novoLancamento,
-            BindingResult result,
-            Model model) {
+                                BindingResult result,
+                                Model model) {
         if (result.hasErrors()) {
             carregarDados(model, 0);
             model.addAttribute("tipos", TipoLancamento.values());
+            model.addAttribute("lancamentoParaEditar", new Lancamento());
             return "index";
         }
+
         lancamentoRepository.save(novoLancamento);
         carregarDados(model, 0);
+
         return "index :: lista-lancamentos";
     }
 
     public String addLancamento(Lancamento novoLancamento, Model model) {
-        return addLancamento(novoLancamento, new BeanPropertyBindingResult(novoLancamento, "novoLancamento"), model);
+        return addLancamento(novoLancamento,
+                new BeanPropertyBindingResult(novoLancamento, "novoLancamento"),
+                model);
     }
 
     @DeleteMapping("/lancamentos/{id}")
     public String deleteLancamento(@PathVariable Long id,
-            @RequestParam(value = "page", defaultValue = "0") int page,
-            Model model) {
+                                   @RequestParam(value = "page", defaultValue = "0") int page,
+                                   Model model) {
         lancamentoRepository.deleteById(id);
         carregarDados(model, page);
         return "index :: lista-lancamentos";
@@ -95,11 +104,9 @@ public class LancamentoController {
 
     @GetMapping("/lancamentos/editar/{id}")
     public String editLancamento(@PathVariable Long id,
-            @RequestParam(value = "page", defaultValue = "0") int page,
-            Model model) {
+                                 Model model) {
         Optional<Lancamento> lancamentoOpt = lancamentoRepository.findById(id);
         if (lancamentoOpt.isPresent()) {
-            carregarDados(model, page);
             model.addAttribute("lancamentoParaEditar", lancamentoOpt.get());
             model.addAttribute("tipos", TipoLancamento.values());
             return "index :: form-edicao";
@@ -107,13 +114,9 @@ public class LancamentoController {
         return "index :: lista-lancamentos";
     }
 
-    public String editLancamento(Long id, Model model) {
-        return editLancamento(id, 0, model);
-    }
-
     @GetMapping("/lancamentos/lista")
     public String listaLancamentos(@RequestParam(value = "page", defaultValue = "0") int page,
-            Model model) {
+                                   Model model) {
         carregarDados(model, page);
         model.addAttribute("tipos", TipoLancamento.values());
         return "index :: lista-lancamentos";
@@ -121,9 +124,15 @@ public class LancamentoController {
 
     @PutMapping("/lancamentos/{id}")
     public String updateLancamento(@PathVariable Long id,
-            @ModelAttribute Lancamento lancamentoAtualizado,
-            @RequestParam(value = "page", defaultValue = "0") int page,
-            Model model) {
+                                   @Valid @ModelAttribute("lancamentoParaEditar") Lancamento lancamentoAtualizado,
+                                   BindingResult result,
+                                   Model model) {
+        if (result.hasErrors()) {
+            carregarDados(model, 0);
+            model.addAttribute("tipos", TipoLancamento.values());
+            return "index";
+        }
+
         Optional<Lancamento> lancamentoOpt = lancamentoRepository.findById(id);
         if (lancamentoOpt.isPresent()) {
             Lancamento lancamentoExistente = lancamentoOpt.get();
@@ -133,11 +142,15 @@ public class LancamentoController {
             lancamentoExistente.setData(lancamentoAtualizado.getData());
             lancamentoRepository.save(lancamentoExistente);
         }
-        carregarDados(model, page);
+
+        carregarDados(model, 0);
         return "index :: lista-lancamentos";
     }
 
     public String updateLancamento(Long id, Lancamento lancamentoAtualizado, Model model) {
-        return updateLancamento(id, lancamentoAtualizado, 0, model);
+        return updateLancamento(id,
+                lancamentoAtualizado,
+                new BeanPropertyBindingResult(lancamentoAtualizado, "lancamentoParaEditar"),
+                model);
     }
 }
