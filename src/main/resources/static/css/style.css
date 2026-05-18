@@ -1,0 +1,278 @@
+:root {
+    --bg-color: #f4f5f7;
+    --card-bg-color: #ffffff;
+    --text-color: #172b4d;
+    --subtext-color: #6b778c;
+    --border-color: #dfe1e6;
+    --primary-color: #0052cc;
+    --primary-hover-color: #0065ff;
+    --green-color: #36b37e;
+    --red-color: #de350b;
+    --yellow-color: #ffab00;
+    --grey-color: #6b778c;
+    --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+html.dark {
+    --bg-color: #172b4d;
+    --card-bg-color: #283e5d;
+    --text-color: #b0c0db;
+    --subtext-color: #8c9cb5;
+    --border-color: #42526e;
+    --primary-color: #4c9aff;
+    --primary-hover-color: #69b4ff;
+}
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+body {
+    padding: 40px;
+}
+
+.container {
+    max-width: 900px;
+    margin: auto;
+    background: var(--card-bg-color);
+    padding: 24px;
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+    transition: background-color 0.3s;
+}
+
+h1 {
+    margin-top: 0;
+    margin-bottom: 20px;
+}
+
+.form-row {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+}
+
+.form-row input,
+.form-row select,
+.edit-form-row input,
+.edit-form-row select {
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid var(--border-color);
+    font-size: 14px;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    min-width: 0;
+}
+
+.input-desc {
+    flex: 2;
+}
+
+.input-valor,
+.select-tipo,
+.add-btn {
+    flex: 1;
+}
+
+button {
+    padding: 10px 15px;
+    border-radius: 5px;
+    border: none;
+    font-size: 14px;
+    font-weight: 600;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.add-btn {
+    background-color: var(--primary-color);
+}
+
+.add-btn:hover {
+    background-color: var(--primary-hover-color);
+}
+
+.list-header,
+.list-item,
+.edit-form-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.list-header {
+    font-weight: 600;
+    color: var(--subtext-color);
+    font-size: 12px;
+    text-transform: uppercase;
+}
+
+.col-desc {
+    flex: 4;
+    min-width: 0;
+}
+
+.col-valor {
+    flex: 2;
+    min-width: 0;
+}
+
+.col-data {
+    flex: 2;
+    min-width: 0;
+}
+
+.col-tipo {
+    flex: 2;
+    min-width: 0;
+}
+
+.col-acoes {
+    flex: 3;
+    min-width: 0;
+    justify-content: flex-end;
+    display: flex;
+}
+
+.valor {
+    text-align: right;
+}
+
+.valor.despesa {
+    color: var(--red-color);
+}
+
+.valor.receita {
+    color: var(--green-color);
+}
+
+.saldo-card {
+    background-color: var(--card-bg-color);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 18px;
+    box-shadow: var(--shadow);
+}
+
+.saldo-title {
+    font-size: 0.9rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--subtext-color);
+    margin-bottom: 8px;
+}
+
+.saldo-valor {
+    font-size: 2rem;
+    font-weight: 700;
+}
+
+.actions-wrapper {
+    display: flex;
+    gap: 8px;
+}
+
+.action-btn {
+    font-size: 12px;
+    padding: 6px 12px;
+}
+
+.field-group {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.error-message {
+    color: var(--red-color);
+    font-size: 12px;
+    margin-top: 4px;
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 20px;
+}
+
+.pagination button {
+    padding: 8px 14px;
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+    background-color: var(--card-bg-color);
+    color: var(--text-color);
+    cursor: pointer;
+}
+
+.pagination button.active,
+.pagination button:hover {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.edit-btn {
+    background-color: var(--yellow-color);
+}
+
+.delete-btn {
+    background-color: var(--red-color);
+}
+
+.save-btn {
+    background-color: var(--green-color);
+}
+
+.cancel-btn {
+    background-color: var(--grey-color);
+}
+
+.footer {
+    text-align: center;
+    margin-top: 24px;
+    font-size: 12px;
+    color: var(--subtext-color);
+}
+
+#theme-toggle {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background-color: var(--card-bg-color);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+@media (max-width: 768px) {
+
+    .form-row,
+    .list-header,
+    .list-item,
+    .edit-form-row {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .col-acoes {
+        justify-content: flex-start;
+    }
+}

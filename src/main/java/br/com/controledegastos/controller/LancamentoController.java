@@ -3,18 +3,26 @@ package br.com.controledegastos.controller;
 import br.com.controledegastos.model.Lancamento;
 import br.com.controledegastos.model.TipoLancamento;
 import br.com.controledegastos.repository.LancamentoRepository;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BeanPropertyBindingResult;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
-import java.util.Comparator;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,32 +32,65 @@ public class LancamentoController {
     @Autowired
     private LancamentoRepository lancamentoRepository;
 
-    private void carregarLancamentos(Model model) {
-        List<Lancamento> lancamentos = lancamentoRepository.findAll();
-        lancamentos.sort(Comparator.comparing(Lancamento::getData).reversed());
-        model.addAttribute("lancamentos", lancamentos);
+    // Método auxiliar para carregar dados e calcular o saldo
+    private void carregarDados(Model model, int page) {
+        Pageable pageable = PageRequest.of(page, 5, Sort.by("data").descending());
+        Page<Lancamento> lancamentosPage = lancamentoRepository.findAll(pageable);
+
+        List<Lancamento> todosLancamentos = lancamentoRepository.findAll();
+        BigDecimal saldo = todosLancamentos.stream()
+                .map(l -> l.getTipo() == TipoLancamento.RECEITA ? l.getValor() : l.getValor().negate())
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        model.addAttribute("lancamentos", lancamentosPage.getContent());
+        model.addAttribute("saldo", saldo);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", lancamentosPage.getTotalPages());
     }
 
     @GetMapping("/")
-    public String index(Model model, @RequestHeader(value = "HX-Request", defaultValue = "false") boolean hxRequest) {
-        carregarLancamentos(model);
+    public String index(Model model,
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestHeader(value = "HX-Request", defaultValue = "false") boolean hxRequest) {
+        carregarDados(model, page);
         model.addAttribute("novoLancamento", new Lancamento());
         model.addAttribute("tipos", TipoLancamento.values());
         return hxRequest ? "index :: lista-lancamentos" : "index";
     }
 
+    public String index(Model model, boolean hxRequest) {
+        return index(model, 0, hxRequest);
+    }
+
     @PostMapping("/lancamentos")
-    public String addLancamento(@ModelAttribute Lancamento novoLancamento, Model model) {
+    public String addLancamento(@Valid @ModelAttribute("novoLancamento") Lancamento novoLancamento,
+            BindingResult result,
+            Model model) {
+        if (result.hasErrors()) {
+            carregarDados(model, 0);
+            model.addAttribute("tipos", TipoLancamento.values());
+            return "index";
+        }
         lancamentoRepository.save(novoLancamento);
-        carregarLancamentos(model);
+        carregarDados(model, 0);
         return "index :: lista-lancamentos";
     }
 
+    public String addLancamento(Lancamento novoLancamento, Model model) {
+        return addLancamento(novoLancamento, new BeanPropertyBindingResult(novoLancamento, "novoLancamento"), model);
+    }
+
     @DeleteMapping("/lancamentos/{id}")
-    public String deleteLancamento(@PathVariable Long id, Model model) {
+    public String deleteLancamento(@PathVariable Long id,
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            Model model) {
         lancamentoRepository.deleteById(id);
-        carregarLancamentos(model);
+        carregarDados(model, page);
         return "index :: lista-lancamentos";
+    }
+
+    public String deleteLancamento(Long id, Model model) {
+        return deleteLancamento(id, 0, model);
     }
 
     @GetMapping("/lancamentos/editar/{id}")
@@ -65,13 +106,16 @@ public class LancamentoController {
 
     @GetMapping("/lancamentos/lista")
     public String listaLancamentos(Model model) {
-        carregarLancamentos(model);
+        carregarDados(model, 0);
         model.addAttribute("tipos", TipoLancamento.values());
         return "index :: lista-lancamentos";
     }
 
     @PutMapping("/lancamentos/{id}")
-    public String updateLancamento(@PathVariable Long id, @ModelAttribute Lancamento lancamentoAtualizado, Model model) {
+    public String updateLancamento(@PathVariable Long id,
+            @ModelAttribute Lancamento lancamentoAtualizado,
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            Model model) {
         Optional<Lancamento> lancamentoOpt = lancamentoRepository.findById(id);
         if (lancamentoOpt.isPresent()) {
             Lancamento lancamentoExistente = lancamentoOpt.get();
@@ -81,7 +125,11 @@ public class LancamentoController {
             lancamentoExistente.setData(lancamentoAtualizado.getData());
             lancamentoRepository.save(lancamentoExistente);
         }
-        carregarLancamentos(model);
+        carregarDados(model, page);
         return "index :: lista-lancamentos";
+    }
+
+    public String updateLancamento(Long id, Lancamento lancamentoAtualizado, Model model) {
+        return updateLancamento(id, lancamentoAtualizado, 0, model);
     }
 }
