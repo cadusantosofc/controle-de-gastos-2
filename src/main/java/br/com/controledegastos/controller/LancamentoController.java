@@ -94,9 +94,12 @@ public class LancamentoController {
     }
 
     @GetMapping("/lancamentos/editar/{id}")
-    public String editLancamento(@PathVariable Long id, Model model) {
+    public String editLancamento(@PathVariable Long id,
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            Model model) {
         Optional<Lancamento> lancamentoOpt = lancamentoRepository.findById(id);
         if (lancamentoOpt.isPresent()) {
+            carregarDados(model, page);
             model.addAttribute("lancamentoParaEditar", lancamentoOpt.get());
             model.addAttribute("tipos", TipoLancamento.values());
             return "index :: form-edicao";
@@ -105,8 +108,9 @@ public class LancamentoController {
     }
 
     @GetMapping("/lancamentos/lista")
-    public String listaLancamentos(Model model) {
-        carregarDados(model, 0);
+    public String listaLancamentos(@RequestParam(value = "page", defaultValue = "0") int page,
+            Model model) {
+        carregarDados(model, page);
         model.addAttribute("tipos", TipoLancamento.values());
         return "index :: lista-lancamentos";
     }

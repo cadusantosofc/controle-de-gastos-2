@@ -17,7 +17,7 @@
     <div class="container">
         <h1>Meu Controle de Gastos 💰</h1>
 
-        <form th:object="${novoLancamento}" hx-post="/lancamentos" hx-target="#lista-lancamentos" hx-swap="innerHTML"
+        <form th:object="${novoLancamento}" hx-post="/lancamentos" hx-target="#lista-lancamentos" hx-swap="outerHTML"
             hx-on::after-request="this.reset()" class="form-row">
             <div class="field-group">
                 <input class="input-desc" type="text" th:field="*{descricao}" placeholder="Descrição" required>
@@ -35,13 +35,12 @@
             <button type="submit" class="add-btn">Adicionar</button>
         </form>
 
-        <div id="lista-lancamentos">
-            <div th:fragment="lista-lancamentos">
-                <div class="saldo-card">
-                    <div class="saldo-title">Saldo Atual</div>
-                    <div class="saldo-valor" th:text="|R$ ${#numbers.formatDecimal(saldo, 1, 'POINT', 2, 'COMMA')}|"
-                        th:classappend="${saldo.signum() < 0 ? 'despesa' : 'receita'}"></div>
-                </div>
+        <div id="lista-lancamentos" th:fragment="lista-lancamentos">
+            <div class="saldo-card">
+                <div class="saldo-title">Saldo Atual</div>
+                <div class="saldo-valor" th:text="|R$ ${#numbers.formatDecimal(saldo, 1, 'POINT', 2, 'COMMA')}|"
+                    th:classappend="${saldo.signum() < 0 ? 'despesa' : 'receita'}"></div>
+            </div>
                 <div class="list-header">
                     <div class="col-desc">Descrição</div>
                     <div class="col-valor">Valor</div>
@@ -66,19 +65,18 @@
                                 Alterar
                             </button>
                             <button class="action-btn delete-btn"
-                                th:hx-delete="@{/lancamentos/{id}(id=${lancamento.id})}" hx-target="#lista-lancamentos"
-                                hx-swap="innerHTML" hx-confirm="Tem certeza que deseja excluir?">
+                                th:hx-delete="@{/lancamentos/{id}(id=${lancamento.id},page=${currentPage})}"
+                                hx-target="#lista-lancamentos" hx-swap="outerHTML" hx-confirm="Tem certeza que deseja excluir?">
                                 Excluir
                             </button>
                         </div>
                     </div>
                 </div>
-            </div>
 
             <div class="pagination" th:if="${totalPages > 1}">
                 <button th:each="pageNumber : ${#numbers.sequence(0, totalPages - 1)}" th:text="${pageNumber + 1}"
                     th:classappend="${pageNumber == currentPage} ? ' active' : ''" th:hx-get="@{/(page=${pageNumber})}"
-                    hx-target="#lista-lancamentos" hx-swap="innerHTML">
+                    hx-target="#lista-lancamentos" hx-swap="outerHTML" hx-push-url="true">
                 </button>
             </div>
         </div>
@@ -108,12 +106,12 @@
             </div>
             <div class="col-acoes">
                 <div class="actions-wrapper">
-                    <button class="action-btn save-btn" th:hx-put="@{/lancamentos/{id}(id=${lancamentoParaEditar.id})}"
-                        hx-target="#lista-lancamentos" hx-swap="innerHTML" hx-include="closest .edit-form-row">
+                    <button class="action-btn save-btn" th:hx-put="@{/lancamentos/{id}(id=${lancamentoParaEditar.id},page=${currentPage})}"
+                        hx-target="#lista-lancamentos" hx-swap="outerHTML" hx-include="closest .edit-form-row">
                         Salvar
                     </button>
-                    <button class="action-btn cancel-btn" th:hx-get="@{/lancamentos/lista}"
-                        hx-target="#lista-lancamentos" hx-swap="innerHTML">
+                    <button class="action-btn cancel-btn" th:hx-get="@{/lancamentos/lista(page=${currentPage})}"
+                        hx-target="#lista-lancamentos" hx-swap="outerHTML">
                         Cancelar
                     </button>
                 </div>
