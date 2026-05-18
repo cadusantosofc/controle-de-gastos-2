@@ -107,6 +107,10 @@ public class LancamentoController {
         return "index :: lista-lancamentos";
     }
 
+    public String editLancamento(Long id, Model model) {
+        return editLancamento(id, 0, model);
+    }
+
     @GetMapping("/lancamentos/lista")
     public String listaLancamentos(@RequestParam(value = "page", defaultValue = "0") int page,
             Model model) {
